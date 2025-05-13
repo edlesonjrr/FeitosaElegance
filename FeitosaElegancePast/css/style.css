@@ -8992,169 +8992,9 @@ textarea.form-control {
       padding-top: 15px;
     }
 
-/* parte 2 css */
-
-#cart-popup {
-  display: none; /* Inicialmente escondido */
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background: white;
-  border-left: 1px #fac564;
-  border-radius: 10%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  padding-bottom: 80px; /* Espaço extra na parte inferior para o botão e valor total */
-  z-index: 1000;
-  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
-}
-
-/* Estilo do container do valor total */
-#total-container {
-  position: absolute;
-  bottom: 77px; /* Espaço do fundo, acima do botão */
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Estilo do valor total */
-#total-price {
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0;
-}
-
-#checkout-btn {
-  position: absolute;
-  bottom: 20px; /* Espaço da borda inferior */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #5c3d03;
-  color: white;
-  border: none;
-  padding: 8px 16px; /* Tamanho reduzido do botão */
-  cursor: pointer;
-  font-size: 13px; /* Tamanho reduzido do texto */
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  /* Adiciona largura automática para não encostar nas bordas */
-  width: calc(100% - 40px); /* Largura do botão, considerando padding da pop-up */
-  max-width: 240px; /* Largura máxima do botão */
-}
-
-#checkout-btn:hover {
-  background-color: none;
-}
-
-#cart-popup ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-#cart-popup ul li {
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-#total-price {
-  font-weight: bold;
-  margin-top: 20px;
-  font-size: 16px;
-}
-
-#cart-popup {
-  position: fixed;
-  top: 50px;
-  right: 20px;
-  width: 300px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  overflow-y: auto; /* Caso a lista de produtos seja longa */
-  max-height: 400px; /* Definindo a altura máxima do pop-up */
-}
-
-#cart-popup ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-#cart-popup ul li {
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-#total-price {
-  font-weight: bold;
-  margin-top: 20px;
-  font-size: 16px;
-}
-
-/* Estilo do botão Comprar via WPP */
-#checkout-btn {
-  background-color: #000;
-  color: #fff;
-  padding: 10px;
-  border: #fac564 1px solid;
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-  transition: background-color 1.5s;
-}
-
-#checkout-btn:hover {
-  background-color: #fac564;
-  color: #000;
-}
-
-#close-popup {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #000;
-}
-
-#close-popup:hover {
-  color: red;
-  cursor: pointer;
-}
-
-/* Estilo do botão Adicionar ao Carrinho */
-.add-to-cart-btn {
-  background: transparent;
-  border: 1px solid #5c3d03;
-  color: #5c3d03;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 2s, color 2s;
-}
-
-.add-to-cart-btn:hover{
-  background-color: #fac564;
-  color: #000;
-}
-
-/* Estilo do botão quando clicado (selecionado) */
-.add-to-cart-btn.selected {
-  background-color: #fac564;
-  color: black;
-}
-
 /* Estilo do pop-up do carrinho */
 #cart-popup {
-  display: none; /* Inicialmente escondido */
+  display: none;
   position: fixed;
   top: 0;
   right: 0;
@@ -9167,37 +9007,59 @@ textarea.form-control {
   z-index: 1000;
 }
 
-/* Estilo do botão X para fechar o pop-up geral */
-#cart-popup .close-popup {
+#total-container {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
+  bottom: 77px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 100%;
+}
+
+#checkout-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #5c3d03;
+  color: white;
+  border: none;
+  padding: 8px 16px;
   cursor: pointer;
+  width: calc(100% - 40px);
+  max-width: 240px;
+  border-radius: 5px;
+}
+
+.add-to-cart-btn {
+  background: transparent;
+  border: 1px solid #5c3d03;
+  color: #5c3d03;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 2s, color 2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #fac564;
   color: black;
 }
 
-/* deixa o X geral vermelho*/
-#cart-popup .close-popup:hover{
+.add-to-cart-btn.selected {
+  background-color: #fac564;
+  color: black;
+}
+
+#close-popup {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+}
+
+#close-popup:hover {
   color: red;
-}
-
-/* Estilo do botão de remover produto (X) */
-.remove-item {
-  top: 10px; /* Ajuste conforme necessário para posicionar verticalmente */
-  right: 10px; /* Espaçamento da borda direita do produto */
-  font-size: 16px; /* Tamanho do texto do X */
-  color: black; /* Cor preta */
   cursor: pointer;
-  transition: color 1.5s;
-}
-
-/* deixa o X do item vermelho*/
-.remove-item:hover {
-  color: red; /* cor vermelha quando passa em cima */
-}
-
-.product-name {
-  color: #000;
-  font-weight: bolder;
 }
