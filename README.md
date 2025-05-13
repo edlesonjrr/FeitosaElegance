@@ -15,14 +15,14 @@ FeitosaElegancePast/
 │   ├── routes.js        # Rotas de navegação 
 ├── node_modules/        # Dependências Node 
 ├── scss/                # Estilos em SCSS (pré-processado) 
-├── about.html 
-├── backend.html 
-├── cadastro.html 
-├── contact.html 
+├── about.html           # Página de "sobre"
+├── backend.html         # Interface do backend
+├── cadastro.html        # Página de cadastro 
+├── contact.html         # Página de contato
 ├── index.html           # Página principal 
 ├── loja.html            # Página da loja 
-├── remember.html 
-├── services.html 
+├── remember.html        # Esqueci a senha
+├── services.html        # Página de serviços
 ├── bancodedados.js      # Simulação de banco (mock) 
 ├── package.json 
 ├── package-lock.json 
