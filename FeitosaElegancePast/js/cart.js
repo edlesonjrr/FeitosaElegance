@@ -1,107 +1,133 @@
-// Produtos e preços
 const products = [
-    { id: 'prod1', name: 'Bolsa Morizetti', price: 360 },
-    { id: 'prod2', name: 'Bolsa de Couro', price: 500 },
-    // Continue adicionando os produtos aqui
+    { id: "prod1", name: "Bolsa Morizetti", price: 360 },
+    { id: "prod2", name: "Bolsa de Couro", price: 500 },
+    { id: "prod3", name: "Bolsa Premium", price: 420 },
+    { id: "prod4", name: "Relógio Clássico", price: 250 }
 ];
 
-// Inicializa o carrinho e o valor total
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let totalPrice = parseFloat(localStorage.getItem('totalPrice')) || 0;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// Função para carregar produtos dinamicamente
+function save() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
 function loadProducts() {
-    const productList = document.getElementById('product-list');
-    productList.innerHTML = '';
+    const list = document.getElementById("product-list");
+    list.innerHTML = "";
 
-    products.forEach(product => {
-        const productDiv = document.createElement('div');
-        productDiv.classList.add('col-lg-3', 'd-flex', 'mb-sm-4');
-        productDiv.innerHTML = `
+    products.forEach(p => {
+        list.innerHTML += `
+        <div class="col-lg-3 d-flex mb-sm-4">
             <div class="staff">
-                <div class="img mb-4" style="background-image: url(images/${product.id}.png);"></div>
+                <div class="img mb-4" style="background-image: url(images/${p.id}.png);"></div>
                 <div class="info text-center">
-                    <h3>${product.name}</h3>
-                    <span class="position">R$ ${product.price.toFixed(2)}</span>
-                    <button id="${product.id}" class="add-to-cart-btn" data-product-name="${product.name}" data-product-price="${product.price}">Colocar no carrinho</button>
+                    <h3>${p.name}</h3>
+                    <span class="position">R$ ${p.price.toFixed(2)}</span>
+                    <button class="add-to-cart-btn"
+                        data-id="${p.id}"
+                        data-name="${p.name}"
+                        data-price="${p.price}">
+                        Colocar no carrinho
+                    </button>
                 </div>
             </div>
+        </div>`;
+    });
+}
+
+function openCart() {
+    document.getElementById("cart-popup").classList.add("open");
+}
+
+function closeCart() {
+    document.getElementById("cart-popup").classList.remove("open");
+}
+
+function updateCart() {
+    const ul = document.getElementById("cart-items");
+    ul.innerHTML = "";
+
+    if (cart.length === 0) {
+        ul.innerHTML = `<p class="empty-msg">Seu carrinho está vazio</p>`;
+        document.getElementById("total-price").textContent = `Total: R$ 0,00`;
+        save();
+        return;
+    }
+
+    cart.forEach(item => {
+        ul.innerHTML += `
+            <li>
+                <span>(${item.qty}x) ${item.name}</span>
+                <div class="qty-box">
+                    <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                    <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                </div>
+            </li>
         `;
-        productList.appendChild(productDiv);
-    });
-}
-
-// Função para adicionar produto ao carrinho
-function addToCart(productId, productName, price) {
-    const existingProduct = cart.find(item => item.id === productId);
-    if (existingProduct) return;
-
-    cart.push({ id: productId, name: productName, price: parseFloat(price) });
-    totalPrice += parseFloat(price);
-    document.getElementById(productId).classList.add('selected');
-    updateCartUI();
-}
-
-// Função para remover produto do carrinho
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    const productPrice = products.find(product => product.id === productId).price;
-    totalPrice -= productPrice;
-    document.getElementById(productId).classList.remove('selected');
-    updateCartUI();
-}
-
-// Função para atualizar a interface do carrinho
-function updateCartUI() {
-    const cartItems = document.getElementById('cart-items');
-    const totalPriceElement = document.getElementById('total-price');
-
-    cartItems.innerHTML = '';
-    cart.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)} <span class="remove-item" onclick="removeFromCart('${item.id}')">x</span>`;
-        cartItems.appendChild(li);
     });
 
-    totalPriceElement.textContent = `Valor Total: R$ ${totalPrice.toFixed(2)}`;
-    localStorage.setItem('cart', JSON.stringify(cart));
-    localStorage.setItem('totalPrice', totalPrice.toFixed(2));
+    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    document.getElementById("total-price").textContent = `Total: R$ ${total.toFixed(2)}`;
+
+    save();
 }
 
-// Função para enviar os produtos via WhatsApp
+function changeQty(id, delta) {
+    let item = cart.find(i => i.id === id);
+    if (!item) return;
+
+    item.qty += delta;
+
+    if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+    }
+
+    updateCart();
+}
+
+function addToCart(prod) {
+    let item = cart.find(i => i.id === prod.id);
+
+    if (item) {
+        item.qty++;
+    } else {
+        cart.push({ ...prod, qty: 1 });
+    }
+
+    updateCart();
+    openCart();
+}
+
 function sendToWhatsApp() {
-    const whatsappNumber = '5581982744190';
-    let message = 'Produtos selecionados:\n';
-    cart.forEach(item => {
-        message += `${item.name} - R$ ${item.price.toFixed(2)}\n`;
+    const number = "5581982744190";
+    let msg = "Olá! Gostaria de comprar:\n\n";
+
+    cart.forEach(i => {
+        msg += `${i.qty}x ${i.name} - R$ ${(i.qty * i.price).toFixed(2)}\n`;
     });
-    message += `\nValor Total: R$ ${totalPrice.toFixed(2)}`;
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    msg += `\nTotal: R$ ${total.toFixed(2)}`;
+
+    window.open(`https://wa.me/${number}?text=${encodeURIComponent(msg)}`);
 }
 
-// Função para resetar o carrinho
-function resetCart() {
-    cart = [];
-    totalPrice = 0;
-    updateCartUI();
-    document.querySelectorAll('.add-to-cart-btn').forEach(button => button.classList.remove('selected'));
-}
-
-// Carregar produtos e eventos após o DOM carregar
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
-    updateCartUI();
-    
-    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.id;
-            const productName = this.getAttribute('data-product-name');
-            const price = this.getAttribute('data-product-price');
-            addToCart(productId, productName, price);
-        });
+    updateCart();
+
+    // Botões adicionar produto
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("add-to-cart-btn")) {
+            addToCart({
+                id: e.target.dataset.id,
+                name: e.target.dataset.name,
+                price: parseFloat(e.target.dataset.price)
+            });
+        }
     });
 
-    document.getElementById('checkout-btn').addEventListener('click', sendToWhatsApp);
-    document.getElementById('close-popup').addEventListener('click', resetCart);
+    document.getElementById("cart-icon").addEventListener("click", openCart);
+    document.getElementById("close-popup").addEventListener("click", closeCart);
+    document.getElementById("checkout-btn").addEventListener("click", sendToWhatsApp);
 });
