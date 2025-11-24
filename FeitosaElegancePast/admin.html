@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Painel Admin - Produtos</title>
+
     <style>
         body {
             background: #111;
@@ -24,8 +25,6 @@
         label {
             display: block;
             margin-top: 15px;
-            font-size: 14px;
-            color: #ddd;
         }
 
         input {
@@ -33,20 +32,20 @@
             padding: 10px;
             margin-top: 5px;
             border-radius: 6px;
-            border: 1px solid #333;
             background: #000;
-            color: #fff;
+            border: 1px solid #333;
+            color: white;
         }
 
         button {
             width: 100%;
-            padding: 12px;
             margin-top: 20px;
+            padding: 12px;
             background: #c99b2a;
             border: none;
             border-radius: 6px;
-            color: #000;
             font-weight: bold;
+            color: black;
             cursor: pointer;
         }
 
@@ -54,24 +53,11 @@
             opacity: 0.85;
         }
 
-        #preview img {
-            max-width: 150px;
-            margin-top: 10px;
-            border-radius: 6px;
-        }
-
-        pre {
-            white-space: pre-wrap;
-            background: #000;
-            padding: 15px;
-            border-radius: 6px;
+        .msg {
             margin-top: 20px;
-        }
-
-        a.download-link {
-            color: #c99b2a;
-            display: block;
-            margin-top: 10px;
+            padding: 10px;
+            background: #222;
+            border-left: 4px solid #c99b2a;
         }
 
         .btn-voltar {
@@ -83,6 +69,7 @@
             text-decoration: none;
             font-weight: bold;
             margin-bottom: 20px;
+            margin-top: 50px;
         }
 
         .btn-voltar:hover {
@@ -94,102 +81,88 @@
 <body>
 
     <div class="card">
+
         <h2>Painel Admin — Criar Produto</h2>
 
         <label>Nome do Produto</label>
         <input id="nome">
 
-        <label>Preço (número)</label>
-        <input id="preco">
+        <label>Preço</label>
+        <input id="preco" type="number">
 
-        <label>Imagem (PNG/JPG)</label>
+        <label>Imagem</label>
         <input id="imagem" type="file" accept="image/*">
 
-        <div id="preview"></div>
+        <button id="criar">Criar Produto</button>
 
-        <button id="criar">Adicionar Produto</button>
-
-        <h3 style="margin-top:25px">Produtos Criados (local)</h3>
-        <pre id="lista"></pre>
-
+        <div id="msg" class="msg" style="display:none;"></div>
+        <br>
         <a href="loja.html" target="_blank" class="btn-voltar">⬅ Voltar para a Loja</a>
+
     </div>
 
     <script>
         const nome = document.getElementById("nome");
         const preco = document.getElementById("preco");
         const imagem = document.getElementById("imagem");
-        const preview = document.getElementById("preview");
-        const lista = document.getElementById("lista");
         const criar = document.getElementById("criar");
+        const msg = document.getElementById("msg");
 
-        let produtos = [];
+        async function uploadImg(file) {
+            const form = new FormData();
+            form.append("file", file);
 
-        function atualizarLista() {
-            lista.textContent = JSON.stringify(produtos, null, 2);
+            const res = await fetch("/.netlify/functions/uploadImagem", {
+                method: "POST",
+                body: form
+            });
+
+            return res.json();
         }
 
-        imagem.addEventListener("change", () => {
-            const file = imagem.files[0];
-            if (!file) return preview.innerHTML = "";
-            const url = URL.createObjectURL(file);
-            preview.innerHTML = `<img src="${url}">`;
-        });
+        async function addProdutoAPI(dados) {
+            const res = await fetch("/.netlify/functions/addProduto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dados)
+            });
 
-        criar.addEventListener("click", () => {
-            const nomeVal = nome.value.trim();
-            const precoVal = Number(preco.value);
-            const file = imagem.files[0];
+            return res.json();
+        }
 
-            if (!nomeVal || !precoVal || !file) {
-                alert("Preencha nome, preço e imagem.");
+        criar.addEventListener("click", async () => {
+            if (!nome.value || !preco.value || !imagem.files[0]) {
+                alert("Preencha tudo!");
                 return;
             }
 
-            const id = "prod_" + Math.random().toString(36).substr(2, 9);
-            const imgNome = `${id}.png`;
+            msg.style.display = "block";
+            msg.innerHTML = "Enviando imagem...";
 
-            // Adiciona ao array local
-            const produto = {
-                id,
-                nome: nomeVal,
-                preco: precoVal,
-                imagem: `images/produtos/${imgNome}`
-            };
+            // 1) Enviar imagem
+            const imgUpload = await uploadImg(imagem.files[0]);
 
-            produtos.push(produto);
-            atualizarLista();
+            if (!imgUpload.url) {
+                msg.innerHTML = "Erro ao enviar imagem!";
+                return;
+            }
 
-            // Baixar produtos.json atualizado
-            const blobJSON = new Blob([JSON.stringify(produtos, null, 2)], { type: "application/json" });
-            const aJSON = document.createElement("a");
-            aJSON.href = URL.createObjectURL(blobJSON);
-            aJSON.download = "produtos.json";
-            aJSON.className = "download-link";
-            aJSON.textContent = "📄 Baixar produtos.json atualizado";
-            preview.appendChild(aJSON);
+            msg.innerHTML = "Salvando produto...";
 
-            // Baixar a imagem renomeada
-            const reader = new FileReader();
-            reader.onload = e => {
-                const imgBlob = new Blob([e.target.result]);
-                const aIMG = document.createElement("a");
-                aIMG.href = URL.createObjectURL(imgBlob);
-                aIMG.download = imgNome;
-                aIMG.className = "download-link";
-                aIMG.textContent = "🖼️ Baixar imagem renomeada";
-                preview.appendChild(aIMG);
-            };
-            reader.readAsArrayBuffer(file);
+            // 2) Criar produto
+            const novo = await addProdutoAPI({
+                nome: nome.value,
+                preco: Number(preco.value),
+                imagem: imgUpload.url
+            });
 
-            // Limpar formulário
+            msg.innerHTML = "Produto criado com sucesso!";
+
             nome.value = "";
             preco.value = "";
             imagem.value = "";
-            preview.innerHTML = "";
         });
     </script>
-
 
 </body>
 
