@@ -397,6 +397,83 @@ body.activeTabCart .cartTab {
     text-align: center;
     font-size: 26px;
     font-weight: 700;
-    margin: 40px 0 30px;
+    margin: 10px 0 30px;
     letter-spacing: 1px;
 }
+
+
+/* -----------------------------------------------------
+   FILTRO — ÍCONE GARANTIDO
+----------------------------------------------------- */
+
+/* Caixa do filtro */
+.filter-box {
+    position: relative !important;
+    margin-top: -40px;  /* SUBE o filtro */
+    margin-bottom: 30px; /* mantém espaçamento inferior */
+    left: 880px;
+}
+
+
+/* Ícone do filtro */
+.filter-box::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg); /* AGORA APONTA PARA BAIXO */
+    width: 20px;
+    height: 20px;
+
+    background-image: url("https://cdn-icons-png.flaticon.com/512/2985/2985177.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0.95;
+}
+
+
+
+
+/* Select */
+#categoryFilter {
+    position: relative;
+    z-index: 10; /* fica atrás do ícone */
+
+    font-weight: 600;
+    color: #000;
+
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    padding: 10px 40px 10px 50px; /* espaço pro ícone */
+    border-radius: 12px;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+#categoryFilter:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* -----------------------------------------------------
+   GARANTIA: NOME DO PRODUTO SEMPRE BRANCO
+----------------------------------------------------- */
+.listProduct h2,
+.listProduct h2 a {
+    color: #fff !important;
+}
+
+
+
+
+

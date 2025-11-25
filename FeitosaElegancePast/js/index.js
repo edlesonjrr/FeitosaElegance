@@ -78,6 +78,58 @@ export function updateSelectedItems() {
 }
 
 /* ============================================================
+   FILTRO DE CATEGORIA
+============================================================ */
+const categoryFilter = document.getElementById("categoryFilter");
+
+if (categoryFilter) {
+    categoryFilter.addEventListener("change", () => {
+        const selected = categoryFilter.value;
+
+        // limpa lista
+        listProductHTML.innerHTML = "";
+
+        // filtra
+        const filtered =
+            selected === "all"
+                ? products
+                : products.filter(p => p.category === selected);
+
+        // renderiza manualmente os itens filtrados
+        filtered.forEach(p => {
+            const div = document.createElement("div");
+            div.classList.add("item");
+            div.dataset.id = p.id;
+
+            if (getCartQty(p.id) > 0) {
+                div.classList.add("selected");
+            }
+
+            div.innerHTML = `
+                <a href="detail.html?id=${p.id}" class="product-link">
+                    <img src="${p.image}" alt="${p.name}">
+                </a>
+
+                <h2>
+                    <a href="detail.html?id=${p.id}" class="product-link">
+                        ${p.name}
+                    </a>
+                </h2>
+
+                <div class="price">R$ ${p.price.toFixed(2)}</div>
+
+                <button class="addCart" data-id="${p.id}">
+                    Adicionar
+                </button>
+            `;
+
+            listProductHTML.appendChild(div);
+        });
+    });
+}
+
+
+/* ============================================================
    EVENTO GLOBAL — CART UPDATED
 ============================================================ */
 document.addEventListener("cartUpdated", updateSelectedItems);
