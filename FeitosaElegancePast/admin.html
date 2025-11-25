@@ -109,16 +109,27 @@
         const msg = document.getElementById("msg");
 
         async function uploadImg(file) {
-            const form = new FormData();
-            form.append("file", file);
+            try {
+                const form = new FormData();
+                form.append("file", file);
 
-            const res = await fetch("/.netlify/functions/uploadImagem", {
-                method: "POST",
-                body: form
-            });
+                const res = await fetch("/.netlify/functions/uploadImagem", {
+                    method: "POST",
+                    body: form
+                });
 
-            return res.json();
+                if (!res.ok) {
+                    throw new Error("Erro HTTP: " + res.status);
+                }
+
+                return await res.json();
+
+            } catch (e) {
+                console.error("ERRO UPLOAD:", e);
+                return { erro: true };
+            }
         }
+
 
         async function addProdutoAPI(dados) {
             const res = await fetch("/.netlify/functions/addProduto", {
@@ -142,10 +153,11 @@
             // 1) Enviar imagem
             const imgUpload = await uploadImg(imagem.files[0]);
 
-            if (!imgUpload.url) {
+            if (imgUpload.erro || !imgUpload.url) {
                 msg.innerHTML = "Erro ao enviar imagem!";
                 return;
             }
+
 
             msg.innerHTML = "Salvando produto...";
 

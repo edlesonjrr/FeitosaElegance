@@ -1,133 +1,163 @@
-const products = [
-    { id: "prod1", name: "Bolsa Morizetti", price: 360 },
-    { id: "prod2", name: "Bolsa de Couro", price: 500 },
-    { id: "prod3", name: "Bolsa Premium", price: 420 },
-    { id: "prod4", name: "Relógio Clássico", price: 250 }
-];
+// cart.js — versão final corrigida e compatível com index.js + details.js
+import products from "./products.js";
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = [];             
+let listCartHTML;
+let iconCartSpan;
 
-function save() {
+/* --- Evento para atualizar telas --- */
+function dispatchCartUpdate() {
+    document.dispatchEvent(new Event("cartUpdated"));
+}
+
+/* --- LocalStorage --- */
+function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-function loadProducts() {
-    const list = document.getElementById("product-list");
-    list.innerHTML = "";
-
-    products.forEach(p => {
-        list.innerHTML += `
-        <div class="col-lg-3 d-flex mb-sm-4">
-            <div class="staff">
-                <div class="img mb-4" style="background-image: url(images/${p.id}.png);"></div>
-                <div class="info text-center">
-                    <h3>${p.name}</h3>
-                    <span class="position">R$ ${p.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn"
-                        data-id="${p.id}"
-                        data-name="${p.name}"
-                        data-price="${p.price}">
-                        Colocar no carrinho
-                    </button>
-                </div>
-            </div>
-        </div>`;
-    });
+function loadCart() {
+    const saved = localStorage.getItem("cart");
+    cart = saved ? JSON.parse(saved) : [];
 }
 
-function openCart() {
-    document.getElementById("cart-popup").classList.add("open");
+/* --- Obter quantidade de um item --- */
+export function getCartQty(id) {
+    id = Number(id);
+    const item = cart.find(i => i.product_id === id);
+    return item ? item.quantity : 0;
 }
 
-function closeCart() {
-    document.getElementById("cart-popup").classList.remove("open");
-}
+/* --- Adicionar item --- */
+export function addToCart(id) {
+    id = Number(id);
 
-function updateCart() {
-    const ul = document.getElementById("cart-items");
-    ul.innerHTML = "";
+    let item = cart.find(i => i.product_id === id);
 
-    if (cart.length === 0) {
-        ul.innerHTML = `<p class="empty-msg">Seu carrinho está vazio</p>`;
-        document.getElementById("total-price").textContent = `Total: R$ 0,00`;
-        save();
-        return;
+    if (!item) {
+        cart.push({ product_id: id, quantity: 1 });
+    } else {
+        item.quantity++;
     }
+
+    saveCart();
+    renderCart();
+    dispatchCartUpdate();
+}
+
+/* --- Remover item --- */
+export function removeFromCart(id) {
+    id = Number(id);
+
+    let index = cart.findIndex(i => i.product_id === id);
+    if (index < 0) return;
+
+    cart[index].quantity--;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    saveCart();
+    renderCart();
+    dispatchCartUpdate();
+}
+
+/* --- Definir quantidade --- */
+function setProductInCart(id, qty) {
+    id = Number(id);
+    let index = cart.findIndex(i => i.product_id === id);
+
+    if (qty <= 0) {
+        if (index >= 0) cart.splice(index, 1);
+    } else if (index < 0) {
+        cart.push({ product_id: id, quantity: qty });
+    } else {
+        cart[index].quantity = qty;
+    }
+
+    saveCart();
+    renderCart();
+    dispatchCartUpdate();
+}
+
+/* --- Render do carrinho lateral --- */
+function renderCart() {
+    listCartHTML.innerHTML = "";
+    let total = 0;
 
     cart.forEach(item => {
-        ul.innerHTML += `
-            <li>
-                <span>(${item.qty}x) ${item.name}</span>
-                <div class="qty-box">
-                    <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-                    <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
-                </div>
-            </li>
+        const product = products.find(p => p.id === item.product_id);
+        if (!product) return;
+
+        total += item.quantity;
+
+        const div = document.createElement("div");
+        div.classList.add("item");
+
+        div.innerHTML = `
+            <div class="image">
+                <img src="${product.image}">
+            </div>
+
+            <div class="name">${product.name}</div>
+
+            <div class="totalPrice">R$ ${(product.price * item.quantity).toFixed(2)}</div>
+
+            <div class="quantity">
+                <span class="minus" data-id="${product.id}">‹</span>
+                <span>${item.quantity}</span>
+                <span class="plus" data-id="${product.id}">›</span>
+            </div>
         `;
+
+        listCartHTML.appendChild(div);
     });
 
-    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-    document.getElementById("total-price").textContent = `Total: R$ ${total.toFixed(2)}`;
-
-    save();
+    iconCartSpan.innerText = total;
 }
 
-function changeQty(id, delta) {
-    let item = cart.find(i => i.id === id);
-    if (!item) return;
-
-    item.qty += delta;
-
-    if (item.qty <= 0) {
-        cart = cart.filter(i => i.id !== id);
-    }
-
-    updateCart();
-}
-
-function addToCart(prod) {
-    let item = cart.find(i => i.id === prod.id);
-
-    if (item) {
-        item.qty++;
-    } else {
-        cart.push({ ...prod, qty: 1 });
-    }
-
-    updateCart();
-    openCart();
-}
-
-function sendToWhatsApp() {
-    const number = "5581982744190";
-    let msg = "Olá! Gostaria de comprar:\n\n";
-
-    cart.forEach(i => {
-        msg += `${i.qty}x ${i.name} - R$ ${(i.qty * i.price).toFixed(2)}\n`;
-    });
-
-    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    msg += `\nTotal: R$ ${total.toFixed(2)}`;
-
-    window.open(`https://wa.me/${number}?text=${encodeURIComponent(msg)}`);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadProducts();
-    updateCart();
-
-    // Botões adicionar produto
+/* --- Eventos globais --- */
+function registerEvents() {
     document.addEventListener("click", e => {
-        if (e.target.classList.contains("add-to-cart-btn")) {
-            addToCart({
-                id: e.target.dataset.id,
-                name: e.target.dataset.name,
-                price: parseFloat(e.target.dataset.price)
-            });
+        let el = e.target;
+        let id = el.dataset.id;
+
+        if (!id) return;
+
+        id = Number(id);
+
+        let index = cart.findIndex(i => i.product_id === id);
+
+        if (el.classList.contains("minus") && index >= 0) {
+            setProductInCart(id, cart[index].quantity - 1);
+        }
+
+        if (el.classList.contains("plus") && index >= 0) {
+            setProductInCart(id, cart[index].quantity + 1);
         }
     });
+}
 
-    document.getElementById("cart-icon").addEventListener("click", openCart);
-    document.getElementById("close-popup").addEventListener("click", closeCart);
-    document.getElementById("checkout-btn").addEventListener("click", sendToWhatsApp);
-});
+/* --- Inicialização --- */
+const cartInit = () => {
+    listCartHTML = document.querySelector('.listCart');
+
+    const iconCart = document.querySelector('.icon-cart');
+    iconCartSpan = iconCart.querySelector("span");
+
+    const closeCart = document.querySelector('.close');
+    const body = document.body;
+
+    // abrir / fechar sidebar
+    iconCart.addEventListener("click", () => body.classList.toggle("activeTabCart"));
+    closeCart.addEventListener("click", () => body.classList.toggle("activeTabCart"));
+
+    loadCart();
+    renderCart();
+    registerEvents();
+
+    // Dispara atualização inicial para index.js / details.js
+    dispatchCartUpdate();
+};
+
+export default cartInit;

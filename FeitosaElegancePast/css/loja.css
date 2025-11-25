@@ -1,0 +1,402 @@
+/* ————————————————————————————————
+   ESTILO BASE APENAS DA LOJA
+   (Sem conflitos com o style.css principal)
+———————————————————————————————— */
+
+/* Variáveis herdando a estética elegante do site */
+:root {
+    --loja-dark: #1d1d1d;
+    --loja-gray: #3b3b3b;
+    --loja-light: #f1f1f1;
+    --loja-primary: #c9a54d;
+    /* tom mais elegante (ouro queimado) */
+    --loja-radius: 10px;
+    /* menos arredondado p/ combinar com bootstrap */
+    --loja-transition: 0.3s ease;
+}
+
+/* -----------------------------------------------------
+   ÍCONE DO CARRINHO (FLUTUANTE)
+----------------------------------------------------- */
+
+.icon-cart {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--loja-dark);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--loja-transition);
+    z-index: 9999;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.icon-cart:hover {
+    transform: scale(1.07);
+}
+
+.icon-cart span {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #c82333;
+    color: white;
+    width: 23px;
+    height: 23px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+
+/* -----------------------------------------------------
+   CARRINHO LATERAL
+----------------------------------------------------- */
+
+.cartTab {
+    width: 380px;
+    background: #fff;
+    color: #333;
+    position: fixed;
+    top: 0;
+    right: -420px;
+    height: 100%;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.25);
+    display: grid;
+    grid-template-rows: 70px 1fr 70px;
+    transition: var(--loja-transition);
+    z-index: 9998;
+    padding: 0;
+}
+
+.cartTab h1 {
+    padding: 25px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--loja-dark);
+    border-bottom: 1px solid #ececec;
+}
+
+body.activeTabCart .cartTab {
+    right: 0;
+}
+
+/* Lista interna do carrinho */
+.listCart {
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.listCart::-webkit-scrollbar {
+    width: 7px;
+}
+
+.listCart::-webkit-scrollbar-thumb {
+    background: #ccc;
+}
+
+/* Item do carrinho */
+.listCart .item {
+    display: grid;
+    grid-template-columns: 70px 1fr 70px;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #efefef;
+}
+
+.listCart .item img {
+    width: 100%;
+    border-radius: 5px;
+}
+
+.quantity {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.quantity span {
+    width: 28px;
+    height: 28px;
+    background: #e6e6e6;
+    color: #333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.quantity span:nth-child(2) {
+    background: transparent;
+    color: #111;
+}
+
+/* Botões do carrinho */
+.cartTab .btn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.cartTab button {
+    border: 0;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 18px 0;
+}
+
+.cartTab .close {
+    background: #e2e2e2;
+    color: #333;
+}
+
+.cartTab .checkOut {
+    background: var(--loja-primary);
+    color: #fff;
+}
+
+
+/* -----------------------------------------------------
+   LISTA DE PRODUTOS (INTEGRADA AO SEU LAYOUT)
+----------------------------------------------------- */
+
+.listProduct {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+/* Card do produto com efeito vidro fosco (glassmorphism) */
+.listProduct .item {
+    background: rgba(255, 255, 255, 0.12);
+    /* transparente */
+    backdrop-filter: blur(18px);
+    /* vidro fosco */
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: var(--loja-radius);
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    /* borda translúcida */
+    transition: var(--loja-transition);
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Estado selecionado do item (fica dourado) */
+.listProduct .item.selected {
+    border: 1px solid var(--loja-primary);
+    box-shadow: 0 0 18px rgba(201, 165, 77, 0.45);
+    background: rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(20px);
+}
+
+
+
+/* Hover ainda mais premium */
+.listProduct .item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.17);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+
+/* Padronização total das imagens da loja */
+.listProduct .item img {
+    width: 100%;
+    height: 260px;
+    /* TAMANHO PADRÃO */
+    object-fit: cover;
+    /* CROP elegante */
+    object-position: center;
+    /* Centraliza sempre */
+    margin-bottom: 10px;
+    border-radius: var(--loja-radius);
+}
+
+
+/* Nome */
+.listProduct h2 {
+    font-size: 17px;
+    font-weight: 600;
+    color: white;
+    margin-top: 8px;
+}
+
+/* Preço */
+.listProduct .price {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: var(--loja-primary);
+    letter-spacing: normal;
+}
+
+/* Botão estilo vidro líquido (glassmorphism) */
+.listProduct button {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: var(--loja-radius);
+    font-size: 14px;
+    transition: var(--loja-transition);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Hover com efeito "acender" + levantar */
+.listProduct button:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    color: #fff;
+}
+
+
+
+/* -----------------------------------------------------
+   PÁGINA DE DETALHES DO PRODUTO
+----------------------------------------------------- */
+
+.detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+    align-items: center;
+}
+
+.detail .image img {
+    width: 100%;
+    border-radius: var(--loja-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.detail .name {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--loja-dark);
+}
+
+.detail .price {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--loja-primary);
+    margin-bottom: 20px;
+}
+
+.detail .buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.detail .buttons button {
+    padding: 12px 18px;
+    border-radius: var(--loja-radius);
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+}
+
+.detail .buttons button:first-child {
+    background: #e2e2e2;
+}
+
+.detail .buttons button:last-child {
+    background: var(--loja-dark);
+    color: white;
+}
+
+
+/* ===============================================
+   ÍCONE DO CARRINHO FIXO NO TOPO (NOVO GLOBAL)
+=============================================== */
+
+.icon-cart.top {
+    top: 20px !important;
+    right: 30px !important;
+    bottom: auto !important;
+    position: fixed;
+}
+
+.icon-cart svg {
+    width: 24px;
+    height: 24px;
+}
+
+.icon-cart {
+    position: fixed;
+    background: var(--loja-dark);
+    color: #fff;
+    padding: 13px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .3s;
+    z-index: 9999;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
+}
+
+.icon-cart:hover {
+    transform: scale(1.07);
+}
+
+.icon-cart span {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #c82333;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+
+/* -----------------------------------------------------
+   RESPONSIVO
+----------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .detail {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .detail .buttons {
+        justify-content: center;
+    }
+
+    .icon-cart {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+.title-link {
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+.title-details {
+    color: #fff !important;
+    text-decoration: none !important;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 40px 0 30px;
+    letter-spacing: 1px;
+}
