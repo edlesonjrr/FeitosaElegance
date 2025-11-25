@@ -5,177 +5,397 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Painel Admin - Produtos</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap">
 
     <style>
+        /* ===== ESTILIZAÇÃO GERAL ===== */
         body {
-            background: #111;
-            color: #fff;
-            font-family: Arial;
-            padding: 30px;
+            background: #0d0d0d;
+            color: #f2f2f2;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
         }
 
         .card {
-            background: #1b1b1b;
-            padding: 25px;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-        }
-
-        input {
+            background: #1a1a1a;
+            padding: 35px;
+            border-radius: 14px;
+            max-width: 650px;
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 6px;
-            background: #000;
-            border: 1px solid #333;
-            color: white;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+            transition: box-shadow .3s ease, transform .2s ease;
         }
 
+        .card:hover {
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        /* ===== INPUTS / SELECT / TEXTAREA ===== */
+        label {
+            font-weight: 500;
+            margin-top: 15px;
+            display: block;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 6px;
+            border-radius: 10px;
+            background: #111;
+            border: 1px solid #333;
+            color: #f2f2f2;
+            font-size: 15px;
+            transition: .3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #c99b2a;
+            outline: none;
+            box-shadow: 0 0 8px rgba(201, 155, 42, 0.4);
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        /* ===== BOTÕES ===== */
         button {
             width: 100%;
-            margin-top: 20px;
-            padding: 12px;
-            background: #c99b2a;
+            padding: 15px;
+            margin-top: 28px;
+            background: linear-gradient(135deg, #c99b2a, #e7c465);
             border: none;
-            border-radius: 6px;
+            color: #000;
             font-weight: bold;
-            color: black;
+            border-radius: 10px;
             cursor: pointer;
+            transition: transform .2s, box-shadow .3s;
         }
 
         button:hover {
-            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+            filter: brightness(1.05);
         }
 
-        .msg {
+        /* ===== JSON PREVIEW ===== */
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 12px;
             margin-top: 20px;
-            padding: 10px;
-            background: #222;
-            border-left: 4px solid #c99b2a;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+            transition: .3s;
         }
 
+        /* ===== BOTÃO VOLTAR ===== */
         .btn-voltar {
             display: inline-block;
-            background: #c99b2a;
-            color: #000;
-            padding: 10px 18px;
-            border-radius: 6px;
+            margin-top: 35px;
             text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-            margin-top: 50px;
+            color: #000;
+            background: linear-gradient(135deg, #c99b2a, #e7c465);
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform .2s, box-shadow .3s;
         }
 
         .btn-voltar:hover {
-            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ===== MODAL ===== */
+        #modal-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn .3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        #modal {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 750px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Scrollbar elegante */
+        #modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #modal::-webkit-scrollbar-thumb {
+            background: #c99b2a;
+            border-radius: 10px;
+        }
+
+        #modal::-webkit-scrollbar-track {
+            background: #0d0d0d;
+        }
+
+        .modal-item {
+            background: #0d0d0d;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .modal-btns button {
+            flex: 1;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            width: 100%;
+            max-width: 1200px;
+            background: #111;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: .5px;
+            color: #c99b2a;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 18px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #f2f2f2;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: .3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(201, 155, 42, 0.15);
+            color: #c99b2a;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 12px 16px;
+            }
+
+            .nav-right {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
     </style>
+
 </head>
 
 <body>
 
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo">ADMIN • E-COMMERCE</span>
+        </div>
+
+        <div class="nav-right">
+            <a href="index.html" target="_blank" class="nav-link">Ver Loja</a>
+            <a href="#" id="btnNavHistorico" class="nav-link">Histórico</a>
+            <a href="index.html" class="nav-link">Sair</a>
+        </div>
+    </nav>
+
     <div class="card">
+        <h2>📦 Criar Novo Produto</h2>
 
-        <h2>Painel Admin — Criar Produto</h2>
-
-        <label>Nome do Produto</label>
+        <label for="nome">Nome do Produto</label>
         <input id="nome">
 
-        <label>Preço</label>
-        <input id="preco" type="number">
+        <label for="preco">Preço (R$)</label>
+        <input id="preco" type="number" min="0" step="0.01">
 
-        <label>Imagem</label>
-        <input id="imagem" type="file" accept="image/*">
+        <label for="categoria">Categoria</label>
+        <select id="categoria">
+            <option value="Bolsas">Bolsas</option>
+            <option value="Relógios">Relógios</option>
+            <option value="Garrafas">Garrafas</option>
+            <option value="Carregadores">Carregadores</option>
+            <option value="Malas">Malas</option>
+            <option value="Fones">Fones de Ouvido</option>
+            <option value="Estojo">Estojo</option>
+        </select>
 
-        <button id="criar">Criar Produto</button>
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao"></textarea>
 
-        <div id="msg" class="msg" style="display:none;"></div>
-        <br>
-        <a href="loja.html" target="_blank" class="btn-voltar">⬅ Voltar para a Loja</a>
+        <label for="imagem">Imagem</label>
+        <input id="imagem" placeholder="Ex: images/bolsa1.png">
 
+        <button id="gerar">Gerar JSON</button>
+
+        <pre id="jsonResultado" style="display:none;"></pre>
+        <button id="copiar" style="display:none;background:#444;">Copiar JSON</button>
+
+        <a href="loja.html" target="_blank" class="btn-voltar">⬅ Visualizar Loja</a>
+    </div>
+
+    <!-- ===== MODAL / POPUP ===== -->
+    <div id="modal-bg">
+        <div id="modal">
+            <h3>📜 Histórico de Produtos</h3>
+            <div id="listaHistorico"></div>
+
+            <div class="modal-btns">
+                <button id="limparHistorico" class="btn-delete">🗑 Limpar</button>
+                <button id="fecharModal" class="btn-close">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const nome = document.getElementById("nome");
-        const preco = document.getElementById("preco");
-        const imagem = document.getElementById("imagem");
-        const criar = document.getElementById("criar");
-        const msg = document.getElementById("msg");
-
-        async function uploadImg(file) {
-            try {
-                const form = new FormData();
-                form.append("file", file);
-
-                const res = await fetch("/.netlify/functions/uploadImagem", {
-                    method: "POST",
-                    body: form
-                });
-
-                if (!res.ok) {
-                    throw new Error("Erro HTTP: " + res.status);
-                }
-
-                return await res.json();
-
-            } catch (e) {
-                console.error("ERRO UPLOAD:", e);
-                return { erro: true };
-            }
+        // ====== GERADOR DE ID ======
+        function getNextId() {
+            const ultimoId = localStorage.getItem("ultimoId") || "0";
+            const novoId = parseInt(ultimoId) + 1;
+            localStorage.setItem("ultimoId", novoId);
+            return novoId;
         }
 
+        // ====== GERAR JSON ======
+        document.getElementById("gerar").addEventListener("click", () => {
+            const data = {
+                id: getNextId(),
+                name: document.getElementById("nome").value.trim(),
+                price: parseFloat(document.getElementById("preco").value),
+                image: document.getElementById("imagem").value.trim(),
+                category: document.getElementById("categoria").value.trim(),
+                description: document.getElementById("descricao").value.trim(),
+            };
 
-        async function addProdutoAPI(dados) {
-            const res = await fetch("/.netlify/functions/addProduto", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(dados)
-            });
-
-            return res.json();
-        }
-
-        criar.addEventListener("click", async () => {
-            if (!nome.value || !preco.value || !imagem.files[0]) {
-                alert("Preencha tudo!");
+            if (!data.name || !data.price || !data.image || !data.category || !data.description) {
+                alert("Preencha todos os campos!");
                 return;
             }
 
-            msg.style.display = "block";
-            msg.innerHTML = "Enviando imagem...";
+            const jsonString = JSON.stringify(data, null, 4);
 
-            // 1) Enviar imagem
-            const imgUpload = await uploadImg(imagem.files[0]);
+            // Salvar no histórico
+            let historico = JSON.parse(localStorage.getItem("historicoProdutos") || "[]");
+            historico.push(data);
+            localStorage.setItem("historicoProdutos", JSON.stringify(historico));
 
-            if (imgUpload.erro || !imgUpload.url) {
-                msg.innerHTML = "Erro ao enviar imagem!";
+            // Mostrar JSON na tela
+            const jsonBlock = document.getElementById("jsonResultado");
+            jsonBlock.textContent = jsonString;
+            jsonBlock.style.display = "block";
+            document.getElementById("copiar").style.display = "block";
+        });
+
+        // ====== COPIAR JSON ======
+        document.getElementById("copiar").addEventListener("click", () => {
+            navigator.clipboard.writeText(document.getElementById("jsonResultado").textContent);
+            alert("JSON copiado!");
+        });
+
+        // ====== ABRIR HISTÓRICO DA NAVBAR ======
+        document.getElementById("btnNavHistorico").addEventListener("click", abrirModal);
+
+        function abrirModal() {
+            const modalBg = document.getElementById("modal-bg");
+            const lista = document.getElementById("listaHistorico");
+            lista.innerHTML = "";
+            modalBg.style.display = "flex";
+
+            const historico = JSON.parse(localStorage.getItem("historicoProdutos") || "[]");
+            if (historico.length === 0) {
+                lista.innerHTML = "<p>Nenhum produto criado ainda...</p>";
                 return;
             }
 
-
-            msg.innerHTML = "Salvando produto...";
-
-            // 2) Criar produto
-            const novo = await addProdutoAPI({
-                nome: nome.value,
-                preco: Number(preco.value),
-                imagem: imgUpload.url
+            historico.forEach(item => {
+                const div = document.createElement("div");
+                div.classList.add("modal-item");
+                div.innerHTML = `
+                    <pre>${JSON.stringify(item, null, 4)}</pre>
+                    <button class="btn-copy" onclick="navigator.clipboard.writeText('${JSON.stringify(item)}')">Copiar</button>
+                `;
+                lista.appendChild(div);
             });
+        }
 
-            msg.innerHTML = "Produto criado com sucesso!";
+        // ====== LIMPAR HISTÓRICO ======
+        document.getElementById("limparHistorico").addEventListener("click", () => {
+            if (confirm("Tem certeza que deseja apagar TODO o histórico?")) {
+                localStorage.removeItem("historicoProdutos");
+                document.getElementById("listaHistorico").innerHTML = "<p>Histórico limpo.</p>";
+            }
+        });
 
-            nome.value = "";
-            preco.value = "";
-            imagem.value = "";
+        // ====== FECHAR MODAL ======
+        document.getElementById("fecharModal").addEventListener("click", () => {
+            document.getElementById("modal-bg").style.display = "none";
         });
     </script>
-
 </body>
-
 </html>

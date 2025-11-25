@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Minha Conta | Feitosa Elegance</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- FONTES E ESTILOS DA LOJA -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/user.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR ORIGINAL -->
+    <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+        <div class="container">
+            <img src="images/feitosaTeste1-removebg-preview.png" class="img-fluid2" alt="Logo">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav">
+                <span class="oi oi-menu"></span> Menu
+            </button>
+
+            <div class="collapse navbar-collapse" id="ftco-nav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="about.html" class="nav-link">Sobre</a></li>
+                    <li class="nav-item"><a href="contact.html" class="nav-link">Contato</a></li>
+                    <li class="nav-item"><a href="loja.html" class="nav-link">Loja</a></li>
+                    <li class="nav-item"><a href="admin.html" id="admin-link" class="nav-link"
+                            style="display:none;">Admin Page</a></li>
+                    <li class="nav-item dropdown" id="user-menu" style="display:none;">
+                        <a class="nav-link dropdown-toggle" href="#" id="navUserDropdown" data-toggle="dropdown">
+                            <span id="user-icon"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="usuario.html">Meu Perfil</a>
+                            <a class="dropdown-item" href="#" id="logout-btn">Sair</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAINEL DO USUÁRIO -->
+    <section class="user-section">
+        <div class="container">
+            <div class="user-card">
+                <h2 class="titulo">Minha Conta</h2>
+
+                <div class="info-item"><strong>Nome:</strong> <span id="userName"></span></div>
+                <div class="info-item"><strong>Email:</strong> <span id="userEmail"></span></div>
+                <div class="info-item"><strong>Idade:</strong> <span id="userAge">Não informado</span></div>
+                <div class="info-item"><strong>Sexo:</strong> <span id="userGender">Não informado</span></div>
+
+                <hr>
+
+                <!-- BOTÕES PRINCIPAIS -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnEdit">Editar Informações</button>
+                    <button class="btn btn-outline-light" id="btnPassword">Alterar Senha</button>
+                </div>
+
+
+                <!-- EDITAR INFO -->
+                <form id="editForm" class="form-box d-none">
+                    <h4>Editar</h4>
+                    <input type="text" id="newName" placeholder="Novo nome">
+                    <input type="number" id="newAge" placeholder="Idade">
+                    <select id="newGender">
+                        <option value="">Sexo</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                    <button type="button" id="saveInfo" class="btn btn-success">Salvar</button>
+                </form>
+
+                <!-- ALTERAR SENHA (substitua por completo) -->
+                <form id="passwordForm" class="form-box d-none" onsubmit="return false;">
+                    <h4>Alterar Senha</h4>
+
+                    <div class="password-field">
+                        <input type="password" id="newPassword" placeholder="Nova senha" required
+                            autocomplete="new-password">
+                        <button type="button" class="toggle-btn" aria-label="Mostrar senha"
+                            onclick="togglePasswordVisibility('newPassword', this)">👁</button>
+                    </div>
+
+                    <div class="password-field">
+                        <input type="password" id="confirmPassword" placeholder="Confirmar senha" required
+                            autocomplete="new-password">
+                        <button type="button" class="toggle-btn" aria-label="Mostrar senha"
+                            onclick="togglePasswordVisibility('confirmPassword', this)">👁</button>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-top:12px;">
+                        <button type="button" id="updatePassword" class="btn btn-warning" style="flex:1">Atualizar
+                            senha</button>
+                        <button type="button" id="cancelPassword" class="btn btn-outline-light"
+                            style="flex:1">Cancelar</button>
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SCRIPTS -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- FIREBASE -->
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/userAuth.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+
+
+</body>
+
+</html>
