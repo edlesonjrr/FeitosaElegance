@@ -43,7 +43,6 @@
         <span>0</span>
     </div>
 
-
     <!-- LISTA DE PRODUTOS -->
     <section class="ftco-section">
         <div class="container">
@@ -53,6 +52,7 @@
                     <p class="mt-3">Conheça um pouco dos nossos produtos</p>
                 </div>
             </div>
+
             <!-- FILTRO DE CATEGORIA -->
             <div class="filter-box">
                 <select id="categoryFilter">
@@ -65,7 +65,6 @@
                     <option value="Fones">Fones de Ouvido</option>
                 </select>
             </div>
-
 
             <div class="listProduct"></div>
         </div>
@@ -81,14 +80,168 @@
         </div>
     </div>
 
-    <!-- SCRIPTS DA LOJA (ordem CORRETA) -->
+    <!-- POP-UP DE FINALIZAÇÃO -->
+    <div id="checkoutPopup" class="checkout-popup">
+        <div class="popup-content">
+            <span class="close-popup" id="closePopup">&times;</span>
+
+            <h2>Finalizar Pedido</h2>
+
+            <h3>Resumo do Pedido</h3>
+            <div id="checkoutItems"></div>
+
+            <h3>Total: <span id="checkoutTotal">R$ 0,00</span></h3>
+
+            <h3>Método de Pagamento</h3>
+            <select id="paymentMethod">
+                <option value="Pix">Pix</option>
+                <option value="Cartão de Crédito">Cartão de Crédito</option>
+            </select>
+
+            <h3>Retirada ou Entrega</h3>
+            <select id="deliveryMethod">
+                <option value="retirar">Retirar na loja</option>
+                <option value="entregar">Entrega</option>
+            </select>
+
+            <div id="addressField" style="display:none; margin-top:10px;">
+                <input type="text" id="deliveryAddress" placeholder="Digite o endereço completo">
+            </div>
+
+            <button id="sendWhatsApp" class="popup-button">Enviar Pedido pelo WhatsApp</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS DA LOJA -->
     <script type="module">
         import cartInit from "./js/cart.js";
-        import "./js/products.js";
+        import products from "./js/products.js";
         import "./js/index.js";
 
-        cartInit(); // inicializa sistema de carrinho ANTES de tudo
+        /* ============================
+           INICIALIZA CARRINHO
+        ============================ */
+        cartInit();
+
+        /* ============================
+           SELETORES
+        ============================ */
+        const cartTabBtn = document.querySelector(".checkOut");
+        const checkoutPopup = document.getElementById("checkoutPopup");
+        const closePopup = document.getElementById("closePopup");
+        const checkoutItems = document.getElementById("checkoutItems");
+        const checkoutTotal = document.getElementById("checkoutTotal");
+        const paymentMethod = document.getElementById("paymentMethod");
+        const deliveryMethod = document.getElementById("deliveryMethod");
+        const addressField = document.getElementById("addressField");
+        const sendWhatsApp = document.getElementById("sendWhatsApp");
+
+        /* ============================
+           GARANTE QUE O POP-UP NÃO ABRA SOZINHO
+        ============================ */
+        checkoutPopup.classList.remove("active");
+
+        /* ============================
+   CAMPOS DE ENDEREÇO
+============================ */
+        addressField.innerHTML = `
+    <input id="addressStreet" type="text" placeholder="Rua / Avenida">
+    <input id="addressNumber" type="text" placeholder="Número">
+    <input id="addressDistrict" type="text" placeholder="Bairro">
+    <input id="addressComplement" type="text" placeholder="Complemento (Opcional)">
+    <input id="addressRef" type="text" placeholder="Referência (Opcional)">
+
+    <div class="frete-box">
+        <p><strong>Frete:</strong> O valor será informado pelo atendente no WhatsApp.</p>
+    </div>
+`;
+
+        /* ============================
+           ABRIR POP-UP
+        ============================ */
+        cartTabBtn.addEventListener("click", () => {
+            loadCheckoutData();
+            checkoutPopup.classList.add("active");
+        });
+
+        /* ============================
+           FECHAR POP-UP (X)
+        ============================ */
+        closePopup.addEventListener("click", () => {
+            checkoutPopup.classList.remove("active");
+        });
+
+        /* ============================
+           MOSTRAR/OCULTAR CAMPOS DE ENDEREÇO
+        ============================ */
+        deliveryMethod.addEventListener("change", () => {
+            addressField.style.display =
+                deliveryMethod.value === "entregar" ? "block" : "none";
+        });
+
+        /* ============================
+           CARREGAR RESUMO DO PEDIDO
+        ============================ */
+        function loadCheckoutData() {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            checkoutItems.innerHTML = "";
+
+            let total = 0;
+
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.product_id);
+                if (!product) return;
+
+                const subtotal = product.price * item.quantity;
+                total += subtotal;
+
+                checkoutItems.innerHTML += `
+                <p><strong>${product.name}</strong> x${item.quantity} — R$ ${subtotal.toFixed(2)}</p>
+            `;
+            });
+
+            checkoutTotal.innerText = "R$ " + total.toFixed(2);
+        }
+
+        /* ============================
+           ENVIAR PEDIDO PARA O WHATSAPP
+        ============================ */
+        sendWhatsApp.addEventListener("click", () => {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let message = "*NOVO PEDIDO — FEITOSA ELEGANCE*\n\n";
+
+            let total = 0;
+
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.product_id);
+                if (!product) return;
+
+                const subtotal = product.price * item.quantity;
+                total += subtotal;
+
+                message += `• ${product.name} x${item.quantity} — R$ ${subtotal.toFixed(2)}\n`;
+            });
+
+            message += `\n*Total:* R$ ${total.toFixed(2)}`;
+            message += `\n*Pagamento:* ${paymentMethod.value}`;
+            message += `\n*Entrega:* ${deliveryMethod.value === "entregar" ? "Entrega" : "Retirada na loja"}`;
+
+            if (deliveryMethod.value === "entregar") {
+                const v = id => document.getElementById(id).value;
+
+                message += `\n\n*Endereço:* ${v("addressStreet")}, ${v("addressNumber")} - ${v("addressDistrict")}`;
+                if (v("addressComplement")) message += `\n*Complemento:* ${v("addressComplement")}`;
+                if (v("addressRef")) message += `\n*Referência:* ${v("addressRef")}`;
+            }
+
+            const url = `https://wa.me/5581987225748?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
+        });
     </script>
+
+
+
+
 
 
 

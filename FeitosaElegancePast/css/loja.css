@@ -409,8 +409,10 @@ body.activeTabCart .cartTab {
 /* Caixa do filtro */
 .filter-box {
     position: relative !important;
-    margin-top: -40px;  /* SUBE o filtro */
-    margin-bottom: 30px; /* mantém espaçamento inferior */
+    margin-top: -40px;
+    /* SUBE o filtro */
+    margin-bottom: 30px;
+    /* mantém espaçamento inferior */
     left: 880px;
 }
 
@@ -421,7 +423,8 @@ body.activeTabCart .cartTab {
     position: absolute;
     left: 14px;
     top: 50%;
-    transform: translateY(-50%) rotate(90deg); /* AGORA APONTA PARA BAIXO */
+    transform: translateY(-50%) rotate(90deg);
+    /* AGORA APONTA PARA BAIXO */
     width: 20px;
     height: 20px;
 
@@ -440,7 +443,8 @@ body.activeTabCart .cartTab {
 /* Select */
 #categoryFilter {
     position: relative;
-    z-index: 10; /* fica atrás do ícone */
+    z-index: 10;
+    /* fica atrás do ícone */
 
     font-weight: 600;
     color: #000;
@@ -448,7 +452,8 @@ body.activeTabCart .cartTab {
     background: rgba(255, 255, 255, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.35);
 
-    padding: 10px 40px 10px 50px; /* espaço pro ícone */
+    padding: 10px 40px 10px 50px;
+    /* espaço pro ícone */
     border-radius: 12px;
 
     backdrop-filter: blur(10px);
@@ -473,7 +478,213 @@ body.activeTabCart .cartTab {
     color: #fff !important;
 }
 
+/* ============================
+   POP-UP CHECKOUT — REFINADO
+   ============================ */
+.checkout-popup {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+
+    z-index: 999999;
+}
+
+.checkout-popup.active {
+    display: flex;
+}
+
+/* CONTAINER DO POP-UP */
+.popup-content {
+    width: 420px;
+    max-height: 85vh;
+    /* ← evita pop-up gigante */
+    overflow-y: auto;
+    /* ← scroll automático */
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 26px;
+
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+    position: relative;
+    animation: fadeIn 0.25s ease-out;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* BOTÃO FECHAR */
+.close-popup {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    font-size: 26px;
+    cursor: pointer;
+    z-index: 9999999;
+    color: #000 !important;
+}
+
+/* TÍTULOS */
+.popup-content h2 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #000 !important;
+}
+
+.popup-content h3 {
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* CAIXA DOS ITENS */
+#checkoutItems {
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+#checkoutItems p {
+    padding: 6px 0;
+    margin: 0;
+    border-bottom: 1px solid #e3e3e3;
+    font-size: 14px;
+}
+
+#checkoutItems p:last-child {
+    border-bottom: none;
+}
+
+/* SELECTS */
+.popup-content select {
+    width: 100%;
+    padding: 11px;
+    border-radius: 8px;
+    margin-top: 6px;
+
+    border: 1px solid #ccc;
+    background: #fafafa;
+    font-size: 14px;
+
+    transition: .2s ease;
+}
+
+.popup-content select:focus {
+    border-color: #000;
+}
+
+/* CAMPOS DE ENDEREÇO */
+#addressField {
+    margin-top: 10px;
+    display: none;
+}
+
+#addressField input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 7px;
+
+    border-radius: 8px;
+    border: 1px solid #d4d4d4;
+    background: #fdfdfd;
+
+    font-size: 14px;
+    transition: .2s ease;
+}
+
+#addressField input:focus {
+    border-color: #25D366;
+}
+
+/* BOX DO FRETE — AVISO PROFISSIONAL */
+.frete-box {
+    margin-top: 14px;
+    background: #f8f8f8;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #dddddd;
+    opacity: 0.95;
+}
+
+.frete-box p {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+.frete-box small {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #777;
+    line-height: 1.3;
+    opacity: 0.9;
+}
+
+.frete-box input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px dashed #bcbcbc;
+    background: #ececec;
+    font-size: 13px;
+    text-align: center;
+    color: #555;
+}
 
 
+/* BOTÃO WHATSAPP */
+.popup-button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px;
 
+    border: none;
+    border-radius: 10px;
 
+    background: #25D366;
+    color: #fff;
+
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: .25s ease;
+}
+
+.popup-button:hover {
+    background: #1ebe57;
+    transform: translateY(-2px);
+}
+
+/* TOTAL EM DOURADO */
+#checkoutTotal {
+    color: #bfa14b !important;
+    font-weight: bold;
+    font-size: 18px;
+}
