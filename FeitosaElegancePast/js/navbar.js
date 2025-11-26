@@ -3,107 +3,133 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-const ADMIN_EMAIL = "feitosaelegance@gmail.com"; // email admin preferido
+const ADMIN_EMAIL = "feitosaelegance@gmail.com";
 
-// IDs esperados no HTML:
-// - admin-link      (a href="admin.html" id="admin-link")
-// - user-menu       (li dropdown container, id="user-menu")
-// - user-icon       (elemento dentro de user-menu para mostrar nome/ícone, id="user-icon")
-// - logout-btn      (botao/link de logout, id="logout-btn")
-
-function showElement(id, show = true) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.display = show ? "" : "none";
+// =============================
+// CACHE LOCAL PARA EVITAR DELAY
+// =============================
+function saveUserCache(name) {
+  sessionStorage.setItem("userDisplayName", name);
 }
 
-async function checkIfAdmin(user) {
+function loadUserCache() {
+  return sessionStorage.getItem("userDisplayName");
+}
+
+// =============================
+// CONTROLE DE VISIBILIDADE
+// =============================
+function setVisibility(el, visible) {
+  if (!el) return;
+  el.classList.remove("hidden", "visible");
+  el.classList.add(visible ? "visible" : "hidden");
+}
+
+// =============================
+// CHECAR ADMIN
+// =============================
+async function isAdminUser(user) {
   if (!user) return false;
 
-  // 1) fallback rápido por email
-  if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    return true;
-  }
+  if (user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return true;
 
-  // 2) verifica role no Firestore
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data && data.role && String(data.role).toLowerCase() === "admin") {
-        return true;
-      }
-    }
-  } catch (err) {
-    console.error("Erro ao verificar role admin no Firestore:", err);
+    return snap.exists() && snap.data()?.role === "admin";
+  } catch (e) {
+    console.error("Erro ao checar admin:", e);
+    return false;
   }
-  return false;
 }
 
-function populateUserMenu(user) {
-  // mostra o menu do usuário com nome/email e logout
+// =============================
+// ATUALIZAR NAVBAR DO USUÁRIO
+// =============================
+async function updateUserUI(user) {
   const userIcon = document.getElementById("user-icon");
   const userMenu = document.getElementById("user-menu");
-  if (!userMenu || !userIcon) return;
 
-  // mostrar nome (ou email)
-  const nameToShow = (user.displayName && user.displayName.trim()) ? user.displayName : user.email;
-  userIcon.textContent = nameToShow;
+  if (!userIcon || !userMenu) return;
 
-  showElement("user-menu", true);
-}
-
-function clearUserMenu() {
-  showElement("user-menu", false);
-  const userIcon = document.getElementById("user-icon");
-  if (userIcon) userIcon.textContent = "";
-}
-
-async function handleAuthState(user) {
+  // Sem usuário
   if (!user) {
-    // usuário deslogado
-    showElement("admin-link", false);
-    clearUserMenu();
-    console.log("Navbar: usuário deslogado");
+    setVisibility(userMenu, false);
+    userIcon.textContent = "";
     return;
   }
 
-  // usuário logado: popular menu e checar admin
-  populateUserMenu(user);
+  // ✅ MOSTRA IMEDIATO PELO CACHE (zero delay)
+  const cachedName = loadUserCache();
+  if (cachedName) {
+    userIcon.innerHTML = `<i class="icon-user"></i> ${cachedName}`;
+    setVisibility(userMenu, true);
+  }
 
+  // 🔄 Atualiza silenciosamente com Firestore real
   try {
-    const isAdmin = await checkIfAdmin(user);
-    showElement("admin-link", !!isAdmin);
-    console.log("Navbar: usuário logado:", user.email, "isAdmin:", isAdmin);
+    const snap = await getDoc(doc(db, "users", user.uid));
+    let displayName = user.email.split("@")[0];
+
+    if (snap.exists()) {
+      const data = snap.data();
+      displayName = data.name || displayName;
+    }
+
+    userIcon.innerHTML = `<i class="icon-user"></i> ${displayName}`;
+    setVisibility(userMenu, true);
+
+    saveUserCache(displayName);
+
   } catch (err) {
-    console.error("Navbar: erro ao checar admin:", err);
-    showElement("admin-link", false);
+    console.error("Erro ao carregar dados do usuário:", err);
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // inicial: escondemos elementos caso não existam
-  showElement("admin-link", false);
-  showElement("user-menu", false);
+// =============================
+// ESTADO DE AUTENTICAÇÃO
+// =============================
+async function handleAuth(user) {
+  const adminLink = document.getElementById("admin-link");
 
-  // logout handler (delegado)
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      try {
-        await signOut(auth);
-        // após signOut, onAuthStateChanged será chamado e esconderá tudo
-        window.location.href = "index.html"; // redireciona à home
-      } catch (err) {
-        console.error("Erro ao deslogar:", err);
-        alert("Erro ao sair. Tente novamente.");
-      }
-    });
+  if (!user) {
+    updateUserUI(null);
+    setVisibility(adminLink, false);
+    return;
   }
 
-  // observa alterações de autenticação
-  onAuthStateChanged(auth, (user) => {
-    handleAuthState(user);
+  updateUserUI(user);
+
+  const isAdmin = await isAdminUser(user);
+  setVisibility(adminLink, isAdmin);
+}
+
+// =============================
+// INIT
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // PRE-CARREGA VISUAL BASEADO EM CACHE
+  const cachedName = loadUserCache();
+  const userIcon = document.getElementById("user-icon");
+  const userMenu = document.getElementById("user-menu");
+
+  if (cachedName && userIcon && userMenu) {
+    userIcon.innerHTML = `<i class="icon-user"></i> ${cachedName}`;
+    setVisibility(userMenu, true);
+  }
+
+  // LOGOUT
+  const logoutBtn = document.getElementById("logout-btn");
+  logoutBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    sessionStorage.clear();
+    await signOut(auth);
+    window.location.href = "index.html";
   });
+
+  // OBSERVAR AUTH
+  onAuthStateChanged(auth, (user) => {
+    handleAuth(user);
+  });
+
 });

@@ -1,0 +1,15 @@
+#user-menu, #admin-link {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hidden {
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}

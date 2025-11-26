@@ -48,39 +48,36 @@ const cancelPasswordBtn = document.getElementById("cancelPassword");
 //  AUTENTICAÇÃO AUTOMÁTICA
 // =============================
 onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "cadastro.html";
-        return;
-    }
+    if (!user) return; // não redireciona nem alerta em páginas públicas
+
     try {
         const snap = await getDoc(doc(db, "users", user.uid));
-        if (!snap.exists()) return alert("❌ Usuário não localizado no banco");
+        if (!snap.exists()) return;
 
         const data = snap.data();
 
-        // Exibe info
-        userName.textContent = data.name || "Não informado";
-        userEmail.textContent = data.email || user.email;
-        userAge.textContent = data.age || "Não informado";
-        userGender.textContent = data.gender || "Não informado";
+        if (userName && userEmail && userAge && userGender) {
+            userName.textContent = data.name || "Não informado";
+            userEmail.textContent = data.email || user.email;
+            userAge.textContent = data.age || "Não informado";
+            userGender.textContent = data.gender || "Não informado";
+        }
 
-        // Preenche campos edição
-        newNameField.value = data.name || "";
-        newAgeField.value = data.age || "";
-        newGenderField.value = data.gender || "";
+        if (userIcon && userMenu) {
+            const displayName = data.name || user.email.split("@")[0];
+            userIcon.innerHTML = `<i class="icon-user"></i> ${displayName}`;
+            userMenu.style.display = "block";
+        }
 
-        // Navbar - nome de usuário
-        const displayName = data.name || user.email.split("@")[0];
-        userIcon.innerHTML = `<i class="icon-user"></i> ${displayName}`;
-        userMenu.style.display = "block";
-
-        if (data.role === "admin") adminLink.style.display = "block";
+        if (adminLink && data.role === "admin") {
+            adminLink.style.display = "block";
+        }
 
     } catch (err) {
-        console.error(err);
-        alert("⚠ Erro ao carregar informações do usuário");
+        console.error("Erro ao carregar usuário:", err);
     }
 });
+
 
 // =============================
 //    MOSTRAR / OCULTAR FORMS
